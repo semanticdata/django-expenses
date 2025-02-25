@@ -1,0 +1,116 @@
+{% extends 'expenses/base.html' %}
+
+{% block title %}Home - Recurring Expenses Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-pie"></i> Expenses Overview
+                </h2>
+                {% if expenses %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Amount</th>
+                                    <th>Category</th>
+                                    <th>Frequency</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in expenses %}
+                                <tr>
+                                    <td>{{ expense.name }}</td>
+                                    <td>${{ expense.amount }}</td>
+                                    <td>
+                                        {% if expense.category %}
+                                            <span class="badge bg-info">{{ expense.category.name }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No Category</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ expense.get_frequency_display }}</td>
+                                    <td>{{ expense.due_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if expense.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'admin:expenses_recurringexpense_change' expense.id %}" 
+                                           class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'admin:expenses_expensepayment_add' %}?recurring_expense={{ expense.id }}" 
+                                           class="btn btn-sm btn-success">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No recurring expenses found. 
+                        <a href="{% url 'admin:expenses_recurringexpense_add' %}" class="alert-link">Add your first expense</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if total_by_category %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">
+                    <i class="fas fa-tags"></i> Expenses by Category
+                </h3>
+                <div class="list-group">
+                    {% for category, total in total_by_category %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ category|default:"No Category" }}
+                        <span class="badge bg-primary rounded-pill">${{ total }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if upcoming_payments %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">
+                    <i class="fas fa-calendar"></i> Upcoming Payments
+                </h3>
+                <div class="list-group">
+                    {% for expense in upcoming_payments %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ expense.name }}</h5>
+                            <small>${{ expense.amount }}</small>
+                        </div>
+                        <p class="mb-1">Due: {{ expense.due_date|date:"M d, Y" }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 
