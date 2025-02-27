@@ -79,6 +79,36 @@ git stash pop
 
 These commands will ensure your local repository is synchronized with the latest version from the remote repository.
 
+## Deploying to PythonAnywhere
+
+### Static Files Configuration
+
+To properly serve static files on PythonAnywhere:
+
+1. Make sure your `settings.py` has the following configuration:
+   ```python
+   STATIC_URL = 'static/'
+   STATIC_ROOT = BASE_DIR / 'staticfiles'
+   STATICFILES_DIRS = [
+       BASE_DIR / 'static',
+   ]
+   ```
+
+2. Run `python manage.py collectstatic` to collect all static files into the STATIC_ROOT directory.
+
+3. In your PythonAnywhere dashboard:
+   - Go to the Web tab
+   - Click on your web app
+   - In the "Static files" section, add:
+     - URL: `/static/`
+     - Directory: `/home/yourusername/django-expenses/staticfiles`
+
+4. Make sure your WSGI configuration file (`/var/www/yourusername_pythonanywhere_com_wsgi.py`) has the correct path to your Django project.
+
+5. Reload your web app.
+
+This should resolve any MIME type mismatch errors when serving static files.
+
 ## Usage
 
 Run the development server:
