@@ -21,7 +21,7 @@ A Django-based web application for tracking and managing recurring expenses. Thi
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/django-expenses.git
+git clone https://github.com/semanticdata/django-expenses.git
 cd django-expenses
 ```
 
@@ -114,4 +114,4 @@ python manage.py makemigrations
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+The code in this repository is available under the [MIT License](LICENSE).
