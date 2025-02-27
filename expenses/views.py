@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta
-from .models import RecurringExpense, Category
+from .models import RecurringExpense, Category, ExpensePayment
 
 # Create your views here.
 
@@ -44,10 +44,18 @@ def home(request):
         due_date__lte=thirty_days
     ).order_by('due_date')[:5]
     
+    # Get recent expense payments (last 30 days)
+    thirty_days_ago = timezone.now().date() - timedelta(days=30)
+    recent_payments = ExpensePayment.objects.filter(
+        recurring_expense__user=request.user,
+        payment_date__gte=thirty_days_ago
+    ).order_by('-payment_date')[:5]
+    
     context = {
         'expenses': expenses,
         'total_by_category': total_by_category,
         'upcoming_payments': upcoming_payments,
+        'recent_payments': recent_payments,
     }
     
     return render(request, 'expenses/home.html', context)

@@ -112,5 +112,31 @@
         </div>
     </div>
     {% endif %}
+
+    {% if recent_payments %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">
+                    <i class="fas fa-history"></i> Recent Payments
+                </h3>
+                <div class="list-group">
+                    {% for payment in recent_payments %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ payment.recurring_expense.name }}</h5>
+                            <small>${{ payment.amount_paid }}</small>
+                        </div>
+                        <p class="mb-1">Paid on: {{ payment.payment_date|date:"M d, Y" }}</p>
+                        {% if payment.notes %}
+                        <small class="text-muted">{{ payment.notes }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %} 
