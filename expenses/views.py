@@ -13,6 +13,7 @@ import datetime
 import io
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.contrib.auth import logout
 
 # Create your views here.
 
@@ -266,3 +267,41 @@ def import_data(request):
     
     # If GET request or no file uploaded, show the import form
     return render(request, 'expenses/import.html')
+
+def expense_chart_data(request):
+    # Query your expense data, grouped by category
+    categories = Category.objects.filter(
+        recurringexpense__user=request.user
+    ).distinct()
+    
+    # Prepare data for chart
+    labels = [category.name for category in categories]
+    data = []
+    
+    for category in categories:
+        total = RecurringExpense.objects.filter(
+            user=request.user, 
+            category=category
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+        data.append(float(total))
+    
+    # Return JSON response
+    return JsonResponse({
+        'labels': labels,
+        'datasets': [{
+            'label': 'Expenses by Category',
+            'data': data,
+            'backgroundColor': [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
+                # Add more colors as needed
+            ]
+        }]
+    })
+
+def dashboard(request):
+    return render(request, 'expenses/dashboard.html')
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('home')  # Redirect to home page after logout
