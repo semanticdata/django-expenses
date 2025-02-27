@@ -56,6 +56,29 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
+## PythonAnywhere
+
+If you've already cloned the repository to PythonAnywhere and want to update it with the latest changes from the main branch, you can use the following bash commands:
+
+```bash
+# Fetch the latest changes from the remote repository
+git fetch origin
+
+# Reset your local main branch to match the remote main branch
+git checkout main
+git reset --hard origin/main
+
+# If you have local changes you want to keep, use this approach instead:
+# 1. Stash your changes
+git stash
+# 2. Pull the latest changes
+git pull origin main
+# 3. Reapply your changes
+git stash pop
+```
+
+These commands will ensure your local repository is synchronized with the latest version from the remote repository.
+
 ## Usage
 
 Run the development server:
