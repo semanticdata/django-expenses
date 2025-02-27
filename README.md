@@ -8,6 +8,7 @@ A Django-based web application for tracking and managing recurring expenses. Thi
 - Categorize expenses for better organization
 - View expense history and patterns
 - User authentication and personal expense tracking
+- Export and import data for backup and transfer
 - Simple and intuitive interface
 
 ## Prerequisites
@@ -64,6 +65,38 @@ python manage.py runserver
 ```
 
 The application will be available at <http://127.0.0.1:8000/>
+
+## Data Export and Import
+
+The application provides functionality to export and import your expense data, allowing you to:
+
+- Create backups of your expense data
+- Transfer data between different installations
+- Restore your data if needed
+
+### Exporting Data
+
+To export your data:
+
+1. Log in to your account
+2. Click on the "Data" dropdown in the navigation bar
+3. Select "Export Data"
+4. Your data will be downloaded as a JSON file containing:
+   - All your expense categories
+   - All your recurring expenses
+   - All payment records for your expenses
+
+### Importing Data
+
+To import previously exported data:
+
+1. Log in to your account
+2. Click on the "Data" dropdown in the navigation bar
+3. Select "Import Data"
+4. Upload your JSON backup file
+5. Click "Import Data" to process the file
+
+**Note:** When importing data, existing expenses with the same name and amount will be skipped to avoid duplicates.
 
 ## Development
 
