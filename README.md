@@ -104,6 +104,60 @@ python manage.py makemigrations
 4. Create templates in `templates/` directory
 5. Update tests in `expenses/tests.py`
 
+## Testing
+
+The application includes a comprehensive test suite that covers models, views, utility functions, and admin functionality. The tests ensure that the application works correctly and help catch regressions when making changes.
+
+### Running Tests
+
+To run the entire test suite:
+
+```bash
+python manage.py test
+```
+
+To run tests for a specific app:
+
+```bash
+python manage.py test expenses
+```
+
+### Test Coverage
+
+The test suite includes:
+
+1. **Model Tests**:
+   - Tests for `Category`, `RecurringExpense`, and `ExpensePayment` models
+   - Validation of model fields and constraints
+   - String representation methods
+
+2. **View Tests**:
+   - Authentication and authorization
+   - Context data and calculations
+   - User-specific data isolation
+
+3. **Utility Function Tests**:
+   - Tests for the `calculate_next_recurrence` function with different frequencies
+   - Handling of edge cases
+
+4. **Admin Tests**:
+   - Admin access and permissions
+   - CRUD operations through the admin interface
+
+5. **Multi-User Tests**:
+   - Data isolation between different users
+   - User-specific views and calculations
+
+### Writing New Tests
+
+When adding new features, make sure to add corresponding tests in `expenses/tests.py`. Follow these guidelines:
+
+1. Create a new test class for each major component
+2. Use descriptive test method names that explain what is being tested
+3. Set up test data in the `setUp` method
+4. Test both normal operation and edge cases
+5. Use Django's test client for testing views and forms
+
 ## Contributing
 
 1. Fork the repository
