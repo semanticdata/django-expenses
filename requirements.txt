@@ -1,2 +1,2 @@
 Django
-python-dateutil  # For handling recurring dates
+python-dateutil

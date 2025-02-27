@@ -98,13 +98,23 @@
                     <i class="fas fa-calendar"></i> Upcoming Payments
                 </h3>
                 <div class="list-group">
-                    {% for expense in upcoming_payments %}
-                    <div class="list-group-item">
+                    {% for payment_info in upcoming_payments %}
+                    <div class="list-group-item {% if payment_info.is_satisfied %}list-group-item-success{% endif %}">
                         <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">{{ expense.name }}</h5>
-                            <small>${{ expense.amount }}</small>
+                            <h5 class="mb-1">{{ payment_info.expense.name }}</h5>
+                            <small>${{ payment_info.expense.amount }}</small>
                         </div>
-                        <p class="mb-1">Due: {{ expense.due_date|date:"M d, Y" }}</p>
+                        <p class="mb-1">
+                            Due: {{ payment_info.expense.due_date|date:"M d, Y" }}
+                            {% if payment_info.is_satisfied %}
+                                <span class="badge bg-success">Paid</span>
+                            {% endif %}
+                        </p>
+                        {% if payment_info.is_satisfied and payment_info.next_recurrence %}
+                        <p class="mb-1 text-info">
+                            <i class="fas fa-arrow-right"></i> Next due: {{ payment_info.next_recurrence|date:"M d, Y" }}
+                        </p>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
