@@ -6,6 +6,9 @@ from datetime import timedelta, date
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+import json
+import tempfile
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from .models import Category, RecurringExpense, ExpensePayment
 from .views import calculate_next_recurrence
@@ -608,3 +611,144 @@ class AdminSiteTest(TestCase):
         
         # Verify the category was created
         self.assertTrue(Category.objects.filter(name='New Category').exists())
+
+class DataExportImportTests(TestCase):
+    def setUp(self):
+        # Create a test user
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword'
+        )
+        
+        # Create a test category
+        self.category = Category.objects.create(
+            name='Test Category',
+            description='Test Description'
+        )
+        
+        # Create a test expense
+        self.expense = RecurringExpense.objects.create(
+            name='Test Expense',
+            amount=Decimal('100.00'),
+            category=self.category,
+            frequency='MONTHLY',
+            due_date=date.today(),
+            description='Test Description',
+            user=self.user,
+            is_active=True
+        )
+        
+        # Create a test payment
+        self.payment = ExpensePayment.objects.create(
+            recurring_expense=self.expense,
+            payment_date=date.today() - timedelta(days=5),
+            amount_paid=Decimal('100.00'),
+            notes='Test Payment'
+        )
+        
+        # Set up the client
+        self.client = Client()
+        self.client.login(username='testuser', password='testpassword')
+    
+    def test_export_data(self):
+        """Test that data can be exported correctly"""
+        response = self.client.get(reverse('expenses:export_data'))
+        
+        # Check that the response is successful
+        self.assertEqual(response.status_code, 200)
+        
+        # Check that the content type is JSON
+        self.assertEqual(response['Content-Type'], 'application/json')
+        
+        # Parse the JSON data
+        data = json.loads(response.content.decode('utf-8'))
+        
+        # Check that the data structure is correct
+        self.assertIn('export_date', data)
+        self.assertIn('username', data)
+        self.assertIn('categories', data)
+        self.assertIn('expenses', data)
+        
+        # Check that the category data is correct
+        self.assertEqual(len(data['categories']), 1)
+        self.assertEqual(data['categories'][0]['name'], 'Test Category')
+        
+        # Check that the expense data is correct
+        self.assertEqual(len(data['expenses']), 1)
+        self.assertEqual(data['expenses'][0]['name'], 'Test Expense')
+        self.assertEqual(data['expenses'][0]['amount'], '100.00')
+        
+        # Check that the payment data is correct
+        self.assertEqual(len(data['expenses'][0]['payments']), 1)
+        self.assertEqual(data['expenses'][0]['payments'][0]['amount_paid'], '100.00')
+    
+    def test_import_data(self):
+        """Test that data can be imported correctly"""
+        # Create a sample export data
+        export_data = {
+            'export_date': date.today().isoformat(),
+            'username': 'testuser',
+            'categories': [
+                {
+                    'id': 999,  # Different ID to test mapping
+                    'name': 'New Category',
+                    'description': 'New Description'
+                }
+            ],
+            'expenses': [
+                {
+                    'name': 'New Expense',
+                    'amount': '200.00',
+                    'category_id': 999,
+                    'category_name': 'New Category',
+                    'frequency': 'WEEKLY',
+                    'due_date': date.today().isoformat(),
+                    'description': 'New Description',
+                    'is_active': True,
+                    'payments': [
+                        {
+                            'payment_date': date.today().isoformat(),
+                            'amount_paid': '200.00',
+                            'notes': 'New Payment'
+                        }
+                    ]
+                }
+            ]
+        }
+        
+        # Create a temporary file with the export data
+        json_data = json.dumps(export_data)
+        temp_file = SimpleUploadedFile('export.json', json_data.encode('utf-8'), content_type='application/json')
+        
+        # Post the file to the import view
+        response = self.client.post(reverse('expenses:import_data'), {'import_file': temp_file})
+        
+        # Check that the response redirects to the home page
+        self.assertRedirects(response, reverse('expenses:home'))
+        
+        # Check that the new category was created
+        self.assertTrue(Category.objects.filter(name='New Category').exists())
+        
+        # Check that the new expense was created
+        self.assertTrue(RecurringExpense.objects.filter(name='New Expense').exists())
+        
+        # Check that the new payment was created
+        new_expense = RecurringExpense.objects.get(name='New Expense')
+        self.assertTrue(ExpensePayment.objects.filter(recurring_expense=new_expense).exists())
+    
+    def test_import_invalid_data(self):
+        """Test handling of invalid import data"""
+        # Create invalid JSON data
+        invalid_data = "This is not valid JSON"
+        temp_file = SimpleUploadedFile('invalid.json', invalid_data.encode('utf-8'), content_type='application/json')
+        
+        # Post the file to the import view
+        response = self.client.post(reverse('expenses:import_data'), {'import_file': temp_file})
+        
+        # Check that the response redirects to the home page
+        self.assertRedirects(response, reverse('expenses:home'))
+        
+        # Check that no new data was created
+        self.assertEqual(Category.objects.count(), 1)
+        self.assertEqual(RecurringExpense.objects.count(), 1)
+        self.assertEqual(ExpensePayment.objects.count(), 1)

@@ -24,6 +24,23 @@
                                 <i class="fas fa-plus"></i> Add Expense
                             </a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="dataDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-database"></i> Data
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dataDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'expenses:export_data' %}">
+                                        <i class="fas fa-file-export"></i> Export Data
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'expenses:import_data' %}">
+                                        <i class="fas fa-file-import"></i> Import Data
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'admin:index' %}">
                                 <i class="fas fa-cog"></i> Admin

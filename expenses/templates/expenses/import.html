@@ -1,0 +1,63 @@
+{% extends 'expenses/base.html' %}
+
+{% block title %}Import Data - Recurring Expenses Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-file-import"></i> Import Data</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Upload a JSON backup file to import your expense data. This will add any new expenses and categories from the backup file.
+                </div>
+                
+                <form method="post" enctype="multipart/form-data" class="mt-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="import_file" class="form-label">Select Backup File</label>
+                        <input type="file" class="form-control" id="import_file" name="import_file" accept=".json" required>
+                        <div class="form-text">Only JSON files exported from this application are supported.</div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Importing data will add new expenses and categories. Existing expenses with the same name and amount will be skipped.
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'expenses:home' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-file-import"></i> Import Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-question-circle"></i> About Data Import/Export</h5>
+            </div>
+            <div class="card-body">
+                <h6>What gets exported?</h6>
+                <ul>
+                    <li>All your expense categories</li>
+                    <li>All your recurring expenses</li>
+                    <li>All payment records for your expenses</li>
+                </ul>
+                
+                <h6>How to use this feature:</h6>
+                <ol>
+                    <li>Export your data regularly using the <a href="{% url 'expenses:export_data' %}" class="link-primary">Export Data</a> feature</li>
+                    <li>Store the backup files in a safe location</li>
+                    <li>If needed, use this import feature to restore your data</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
