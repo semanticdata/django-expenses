@@ -86,6 +86,7 @@ These commands will ensure your local repository is synchronized with the latest
 To properly serve static files on PythonAnywhere:
 
 1. Make sure your `settings.py` has the following configuration:
+
    ```python
    STATIC_URL = 'static/'
    STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -108,6 +109,36 @@ To properly serve static files on PythonAnywhere:
 5. Reload your web app.
 
 This should resolve any MIME type mismatch errors when serving static files.
+
+### Troubleshooting Static Files on PythonAnywhere
+
+If you're still experiencing issues with static files on PythonAnywhere, try the following steps:
+
+1. **Check URL Configuration**: Ensure the URL in the static files configuration is exactly `/static/` (with trailing slash).
+
+2. **Verify Directory Path**: Make sure the directory path points to the exact location of your staticfiles directory. It should be something like:
+
+   ```
+   /home/semanticdata/django-expenses/staticfiles
+   ```
+
+   Replace 'semanticdata' with your actual PythonAnywhere username.
+
+3. **Check File Permissions**: Ensure the files in your staticfiles directory have the correct permissions:
+
+   ```bash
+   chmod -R 755 /home/yourusername/django-expenses/staticfiles
+   ```
+
+4. **Debug Mode**: Temporarily set `DEBUG = True` in your settings.py to see more detailed error messages.
+
+5. **Check MIME Types**: If specific file types are still having issues, you might need to add a custom MIME type configuration in your PythonAnywhere web app settings.
+
+6. **Clear Browser Cache**: Sometimes browsers cache the incorrect MIME type responses. Clear your browser cache and try again.
+
+7. **Verify Files Exist**: Double-check that the files referenced in the error messages actually exist in your staticfiles directory.
+
+After making any changes, always remember to reload your web app from the PythonAnywhere dashboard.
 
 ## Usage
 
